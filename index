@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>数独サポート</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            color: #333;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            grid-template-rows: 3fr 1fr;
+            gap: 6px;
+            width: 100% max(95vw, 380px);
+            max-width: 420px;
+            max-height: 90vh;
+            padding: 8px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        /* メインの数独盤面 (左上) */
+        .sudoku-grid {
+            grid-column: 1;
+            grid-row: 1;
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            grid-template-rows: repeat(9, 1fr);
+            border: 2px solid #333;
+            background: #333;
+            gap: 1px;
+        }
+        .cell {
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+        }
+        .cell.selected {
+            background: #d0e8ff;
+        }
+        .cell input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            background: transparent;
+        }
+        .cell input:focus {
+            outline: none;
+            background: #d0e8ff;
+        }
+        /* 太線（3x3ブロックの区切り） */
+        .cell:nth-child(3n):not(:nth-child(9n)) { border-right: 2px solid #333; }
+        .cell:nth-child(n+19):nth-child(-n+27),
+        .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid #333; }
+
+        /* 右側の残数表示エリア */
+        .right-panel {
+            grid-column: 2;
+            grid-row: 1;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            font-size: 11px;
+        }
+        .remaining-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        /* 下側の補助・操作エリア */
+        .bottom-panel {
+            grid-column: 1 / 3;
+            grid-row: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 6px;
+        }
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 3px;
+        }
+        .num-btn {
+            background: #e4e6eb;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 0;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .num-btn:active {
+            background: #d8dadf;
+        }
+        .controls {
+            display: flex;
+            gap: 6px;
+        }
+        .ctrl-btn {
+            flex: 1;
+            background: #42b72a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+        .ctrl-btn.clear {
+            background: #fa383e;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 数独盤面 -->
+    <div class="sudoku-grid" id="grid"></div>
+
+    <!-- 右側：残り数字パネル -->
+    <div class="right-panel" id="rightPanel">
+        <!-- JSで動的生成 -->
+    </div>
+
+    <!-- 下側：テンキー＆操作パネル -->
+    <div class="bottom-panel">
+        <div class="numpad">
+            <button class="num-btn" onclick="inputNumber(1)">1</button>
+            <button class="num-btn" onclick="inputNumber(2)">2</button>
+            <button class="num-btn" onclick="inputNumber(3)">3</button>
+            <button class="num-btn" onclick="inputNumber(4)">4</button>
+            <button class="num-btn" onclick="inputNumber(5)">5</button>
+            <button class="num-btn" onclick="inputNumber(6)">6</button>
+            <button class="num-btn" onclick="inputNumber(7)">7</button>
+            <button class="num-btn" onclick="inputNumber(8)">8</button>
+            <button class="num-btn" onclick="inputNumber(9)">9</button>
+            <button class="num-btn" onclick="inputNumber('')" style="font-size:10px;">クリア</button>
+        </div>
+        <div class="controls">
+            <button class="ctrl-btn" onclick="resetGrid()">リセット</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedCell = null;
+    const gridEl = document.getElementById('grid');
+    const rightPanelEl = document.getElementById('rightPanel');
+    let cells = [];
+
+    // 盤面の初期化
+    function initGrid() {
+        for (let i = 0; i < 81; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.inputMode = 'none'; // スマホのデフォルトキーボードを非表示にして自前テンキーを使う
+            input.maxLength = 1;
+            input.dataset.index = i;
+
+            input.addEventListener('focus', () => {
+                if (selectedCell) selectedCell.classList.remove('selected');
+                selectedCell = cell;
+                cell.classList.add('selected');
+            });
+
+            cell.appendChild(input);
+            gridEl.appendChild(cell);
+            cells.push(input);
+        }
+        updateRemaining();
+    }
+
+    // 数字入力
+    function inputNumber(num) {
+        if (!selectedCell) return;
+        const input = selectedCell.querySelector('input');
+        input.value = num;
+        updateRemaining();
+        
+        // 次のセルへ移動するなどの細かい挙動は必要に応じて追加可能
+    }
+
+    // 残り数字の計算と右側パネルの更新
+    function updateRemaining() {
+        const counts = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0};
+        cells.forEach(input => {
+            const val = parseInt(input.value);
+            if (counts[val] !== undefined) {
+                counts[val]++;
+            }
+        });
+
+        rightPanelEl.innerHTML = '';
+        for (let i = 1; i <= 9; i++) {
+            const rem = 9 - counts[i];
+            const item = document.createElement('div');
+            item.classList.add('remaining-item');
+            item.innerHTML = `<span>${i}:</span> <span style="color:${rem === 0 ? '#ccc' : '#000'}">残り ${rem}</span>`;
+            rightPanelEl.innerHTML += item.outerHTML;
+        }
+    }
+
+    function resetGrid() {
+        cells.forEach(input => input.value = '');
+        updateRemaining();
+    }
+
+    initGrid();
+</script>
+
+</body>
+</html>

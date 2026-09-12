@@ -24,7 +24,7 @@
         .container {
             display: grid;
             grid-template-columns: 3.2fr 1.2fr;
-            grid-template-rows: 3.2fr 1.2fr 1fr;
+            grid-template-rows: 3.2fr 1fr 1fr;
             gap: 4px;
             width: 95vw;
             max-width: 420px;
@@ -73,61 +73,42 @@
         .cell:nth-child(n+19):nth-child(-n+27),
         .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid #333; }
 
-        /* 右側：横（行）の未入力数字（ラベルなし） */
+        /* 右側：行（横）の未入力数字（枠なし・行のセンターに配置） */
         .right-panel {
             grid-column: 2;
             grid-row: 1;
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 4px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            font-size: 10px;
-            overflow-y: auto;
+            display: grid;
+            grid-template-rows: repeat(9, 1fr);
+            padding-left: 6px;
         }
         .missing-row {
             display: flex;
             align-items: center;
-            border-bottom: 1px solid #eee;
-            padding: 1px 0;
+            font-size: 10px;
             font-weight: bold;
             color: #0066cc;
-            letter-spacing: 1px;
-        }
-        .missing-row:last-child {
-            border-bottom: none;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
-        /* 下側：縦（列）の未入力数字（盤面の下にそのまま横並び・ラベルなし） */
+        /* 下側：列（縦）の未入力数字（枠なし・列のセンターに配置） */
         .bottom-info-panel {
             grid-column: 1;
             grid-row: 2;
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 4px;
             display: grid;
             grid-template-columns: repeat(9, 1fr);
-            gap: 2px;
-            align-items: center;
+            padding-top: 2px;
         }
         .col-box {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: #fff;
-            border: 1px solid #e1e1e1;
-            border-radius: 4px;
-            padding: 2px 0;
+            justify-content: center;
         }
         .col-nums {
             font-size: 8px;
             color: #e65100;
             font-weight: bold;
             text-align: center;
-            line-height: 1.1;
+            line-height: 1.2;
         }
 
         /* 右下：3×3テンキー＆操作エリア */
@@ -180,14 +161,14 @@
             text-align: center;
         }
 
-        /* 最下段の左側：リセットボタン等の余裕スペース */
+        /* 左下：リセットボタン */
         .extra-panel {
             grid-column: 1;
             grid-row: 3;
             display: flex;
             align-items: center;
-            justify-content: flex-end;
-            padding-right: 4px;
+            justify-content: flex-start;
+            padding-left: 2px;
         }
         .reset-btn {
             background: #fa383e;
@@ -207,10 +188,10 @@
     <!-- 数独盤面 -->
     <div class="sudoku-grid" id="grid"></div>
 
-    <!-- 右側：行（横）の未入力数字（ラベルなし） -->
+    <!-- 右側：行（横）の未入力数字 -->
     <div class="right-panel" id="rightPanel"></div>
 
-    <!-- 下側：列（縦）の未入力数字（ラベルなし） -->
+    <!-- 下側：列（縦）の未入力数字 -->
     <div class="bottom-info-panel" id="colPanel"></div>
 
     <!-- 右下：3×3テンキー＆操作エリア -->
@@ -275,6 +256,7 @@
     }
 
     function inputNumber(num) {
+        }
         if (!selectedCell) return;
         const input = selectedCell.querySelector('input');
         input.value = num;

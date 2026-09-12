@@ -24,7 +24,7 @@
         .container {
             display: grid;
             grid-template-columns: 3.2fr 1.2fr;
-            grid-template-rows: 2.8fr 1fr 1fr;
+            grid-template-rows: 3.2fr 1.2fr 1fr;
             gap: 4px;
             width: 95vw;
             max-width: 420px;
@@ -73,45 +73,36 @@
         .cell:nth-child(n+19):nth-child(-n+27),
         .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid #333; }
 
-        /* 右側：横（行）の未入力数字 */
+        /* 右側：横（行）の未入力数字（ラベルなし） */
         .right-panel {
             grid-column: 2;
             grid-row: 1;
             background: #f9f9f9;
             border: 1px solid #ddd;
             border-radius: 6px;
-            padding: 3px;
+            padding: 4px;
             display: flex;
             flex-direction: column;
             justify-content: space-around;
-            font-size: 9px;
+            font-size: 10px;
             overflow-y: auto;
         }
         .missing-row {
             display: flex;
-            justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #eee;
             padding: 1px 0;
+            font-weight: bold;
+            color: #0066cc;
+            letter-spacing: 1px;
         }
         .missing-row:last-child {
             border-bottom: none;
         }
-        .missing-label {
-            font-weight: bold;
-            color: #666;
-            font-size: 8px;
-        }
-        .missing-nums {
-            font-weight: bold;
-            color: #0066cc;
-            letter-spacing: 0.5px;
-            font-size: 10px;
-        }
 
-        /* 下側1：縦（列）の未入力数字 */
+        /* 下側：縦（列）の未入力数字（盤面の下にそのまま横並び・ラベルなし） */
         .bottom-info-panel {
-            grid-column: 1 / 3;
+            grid-column: 1;
             grid-row: 2;
             background: #f9f9f9;
             border: 1px solid #ddd;
@@ -131,11 +122,6 @@
             border-radius: 4px;
             padding: 2px 0;
         }
-        .col-label {
-            font-size: 8px;
-            color: #666;
-            font-weight: bold;
-        }
         .col-nums {
             font-size: 8px;
             color: #e65100;
@@ -144,35 +130,42 @@
             line-height: 1.1;
         }
 
-        /* 下側2：テンキー＆操作エリア */
+        /* 右下：3×3テンキー＆操作エリア */
         .bottom-action-panel {
-            grid-column: 1 / 3;
-            grid-row: 3;
+            grid-column: 2;
+            grid-row: 2 / 4;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            gap: 4px;
+            justify-content: space-between;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 4px;
         }
         .numpad {
             display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 2px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3px;
+            flex: 1;
         }
         .num-btn {
             background: #e4e6eb;
             border: none;
             border-radius: 4px;
-            padding: 6px 0;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .num-btn:active {
             background: #d8dadf;
         }
         .controls {
             display: flex;
-            gap: 4px;
+            gap: 3px;
+            margin-top: 4px;
         }
         .ctrl-btn {
             flex: 1;
@@ -180,11 +173,31 @@
             color: white;
             border: none;
             border-radius: 4px;
-            padding: 4px;
-            font-size: 11px;
+            padding: 4px 2px;
+            font-size: 9px;
             font-weight: bold;
             cursor: pointer;
             text-align: center;
+        }
+
+        /* 最下段の左側：リセットボタン等の余裕スペース */
+        .extra-panel {
+            grid-column: 1;
+            grid-row: 3;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 4px;
+        }
+        .reset-btn {
+            background: #fa383e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -194,13 +207,13 @@
     <!-- 数独盤面 -->
     <div class="sudoku-grid" id="grid"></div>
 
-    <!-- 右側：行（横）の未入力数字 -->
+    <!-- 右側：行（横）の未入力数字（ラベルなし） -->
     <div class="right-panel" id="rightPanel"></div>
 
-    <!-- 下側1：列（縦）の未入力数字 -->
+    <!-- 下側：列（縦）の未入力数字（ラベルなし） -->
     <div class="bottom-info-panel" id="colPanel"></div>
 
-    <!-- 下側2：テンキー＆操作エリア -->
+    <!-- 右下：3×3テンキー＆操作エリア -->
     <div class="bottom-action-panel">
         <div class="numpad">
             <button class="num-btn" onclick="inputNumber(1)">1</button>
@@ -212,11 +225,15 @@
             <button class="num-btn" onclick="inputNumber(7)">7</button>
             <button class="num-btn" onclick="inputNumber(8)">8</button>
             <button class="num-btn" onclick="inputNumber(9)">9</button>
-            <button class="num-btn" onclick="inputNumber('')" style="font-size:8px;">消去</button>
         </div>
         <div class="controls">
-            <button class="ctrl-btn" onclick="resetGrid()">すべてリセット</button>
+            <button class="ctrl-btn" onclick="inputNumber('')">消去</button>
         </div>
+    </div>
+
+    <!-- 左下：リセット -->
+    <div class="extra-panel">
+        <button class="reset-btn" onclick="resetGrid()">すべてリセット</button>
     </div>
 </div>
 
@@ -269,9 +286,8 @@
         }
     }
 
-    // 行と列の未インプット数字を計算して更新
     function updatePanels() {
-        // --- 行（横）の計算 ---
+        // 行（横）の計算
         rightPanelEl.innerHTML = '';
         for (let r = 0; r < 9; r++) {
             const rowNums = new Set();
@@ -286,14 +302,11 @@
 
             const rowDiv = document.createElement('div');
             rowDiv.classList.add('missing-row');
-            rowDiv.innerHTML = `
-                <span class="missing-label">行${r + 1}</span>
-                <span class="missing-nums">${missing.join(' ')}</span>
-            `;
+            rowDiv.textContent = missing.join(' ');
             rightPanelEl.appendChild(rowDiv);
         }
 
-        // --- 列（縦）の計算 ---
+        // 列（縦）の計算
         colPanelEl.innerHTML = '';
         for (let c = 0; c < 9; c++) {
             const colNums = new Set();
@@ -308,11 +321,7 @@
 
             const colBox = document.createElement('div');
             colBox.classList.add('col-box');
-            // 縦に並ぶ数字はスペースや改行で収める
-            colBox.innerHTML = `
-                <span class="col-label">列${c + 1}</span>
-                <span class="col-nums">${missing.join('<br>')}</span>
-            `;
+            colBox.innerHTML = `<span class="col-nums">${missing.join('<br>')}</span>`;
             colPanelEl.appendChild(colBox);
         }
     }

@@ -75,21 +75,22 @@
         .cell:nth-child(n+19):nth-child(-n+27),
         .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid #333; }
 
-        /* 右側：行（横）の未入力数字（1行に戻してセンター配置） */
+        /* 右側：行（横）の未入力数字（18行グリッドにして各セルに2行で対応） */
         .right-panel {
             grid-column: 2;
             grid-row: 1;
             display: grid;
-            grid-template-rows: repeat(9, 1fr);
+            grid-template-rows: repeat(18, 1fr);
             padding-left: 4px;
         }
-        .missing-row {
+        .missing-row-part {
+            grid-row: span 2;
             display: flex;
             align-items: center;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: bold;
             color: #0066cc;
-            letter-spacing: 1px;
+            letter-spacing: 0px;
             white-space: nowrap;
         }
 
@@ -246,7 +247,7 @@
     }
 
     function updatePanels() {
-        // 行（横）の計算
+        // 行（横）の計算：2行に分割して配置
         rightPanelEl.innerHTML = '';
         for (let r = 0; r < 9; r++) {
             const rowNums = new Set();
@@ -259,10 +260,19 @@
                 if (!rowNums.has(n)) missing.push(n);
             }
 
-            const rowDiv = document.createElement('div');
-            rowDiv.classList.add('missing-row');
-            rowDiv.textContent = missing.join(' ');
-            rightPanelEl.appendChild(rowDiv);
+            const mid = Math.ceil(missing.length / 2);
+            const part1 = missing.slice(0, mid).join(' ');
+            const part2 = missing.slice(mid).join(' ');
+
+            const div1 = document.createElement('div');
+            div1.classList.add('missing-row-part');
+            div1.textContent = part1;
+            rightPanelEl.appendChild(div1);
+
+            const div2 = document.createElement('div');
+            div2.classList.add('missing-row-part');
+            div2.textContent = part2;
+            rightPanelEl.appendChild(div2);
         }
 
         // 列（縦）の計算

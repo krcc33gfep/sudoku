@@ -23,10 +23,10 @@
         }
         .container {
             display: grid;
-            grid-template-columns: 3fr 1fr;
+            grid-template-columns: 3fr 1.2fr;
             grid-template-rows: 3fr 1fr;
             gap: 6px;
-            width: 100% max(95vw, 380px);
+            width: 95vw;
             max-width: 420px;
             max-height: 90vh;
             padding: 8px;
@@ -50,10 +50,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            user-select: none;
+            position: relative;
         }
         .cell.selected {
             background: #d0e8ff;
@@ -76,24 +73,41 @@
         .cell:nth-child(n+19):nth-child(-n+27),
         .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid #333; }
 
-        /* 右側の残数表示エリア */
+        /* 右側の未入力数字表示エリア */
         .right-panel {
             grid-column: 2;
             grid-row: 1;
             background: #f9f9f9;
             border: 1px solid #ddd;
             border-radius: 6px;
-            padding: 6px;
+            padding: 4px;
             display: flex;
             flex-direction: column;
             justify-content: space-around;
-            font-size: 11px;
+            font-size: 10px;
+            overflow-y: auto;
         }
-        .remaining-item {
+        .missing-row {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 2px;
+        }
+        .missing-row:last-child {
+            border-bottom: none;
+        }
+        .missing-label {
             font-weight: bold;
+            color: #666;
+            margin-bottom: 1px;
+            font-size: 9px;
+        }
+        .missing-nums {
+            font-weight: bold;
+            color: #0066cc;
+            letter-spacing: 1px;
+            font-size: 11px;
+            min-height: 14px;
         }
 
         /* 下側の補助・操作エリア */
@@ -128,7 +142,7 @@
         }
         .ctrl-btn {
             flex: 1;
-            background: #42b72a;
+            background: #fa383e;
             color: white;
             border: none;
             border-radius: 4px;
@@ -138,9 +152,6 @@
             cursor: pointer;
             text-align: center;
         }
-        .ctrl-btn.clear {
-            background: #fa383e;
-        }
     </style>
 </head>
 <body>
@@ -149,7 +160,7 @@
     <!-- 数独盤面 -->
     <div class="sudoku-grid" id="grid"></div>
 
-    <!-- 右側：残り数字パネル -->
+    <!-- 右側：行ごとの未入力数字パネル -->
     <div class="right-panel" id="rightPanel">
         <!-- JSで動的生成 -->
     </div>
@@ -166,10 +177,10 @@
             <button class="num-btn" onclick="inputNumber(7)">7</button>
             <button class="num-btn" onclick="inputNumber(8)">8</button>
             <button class="num-btn" onclick="inputNumber(9)">9</button>
-            <button class="num-btn" onclick="inputNumber('')" style="font-size:10px;">クリア</button>
+            <button class="num-btn" onclick="inputNumber('')" style="font-size:9px;">消去</button>
         </div>
         <div class="controls">
-            <button class="ctrl-btn" onclick="resetGrid()">リセット</button>
+            <button class="ctrl-btn" onclick="resetGrid()">すべてリセット</button>
         </div>
     </div>
 </div>
@@ -180,7 +191,6 @@
     const rightPanelEl = document.getElementById('rightPanel');
     let cells = [];
 
-    // 盤面の初期化
     function initGrid() {
         for (let i = 0; i < 81; i++) {
             const cell = document.createElement('div');
@@ -188,7 +198,7 @@
             
             const input = document.createElement('input');
             input.type = 'text';
-            input.inputMode = 'none'; // スマホのデフォルトキーボードを非表示にして自前テンキーを使う
+            input.inputMode = 'none';
             input.maxLength = 1;
             input.dataset.index = i;
 
@@ -198,46 +208,70 @@
                 cell.classList.add('selected');
             });
 
+            cell.addEventListener('input', () => {
+                // 1〜9以外の文字が入ったら空にする
+                const val = input.value.replace(/[^1-9]/g, '');
+                input.value = val ? val[0] : '';
+                updatePanel();
+            });
+
             cell.appendChild(input);
             gridEl.appendChild(cell);
             cells.push(input);
         }
-        updateRemaining();
+        updatePanel();
     }
 
-    // 数字入力
     function inputNumber(num) {
         if (!selectedCell) return;
         const input = selectedCell.querySelector('input');
         input.value = num;
-        updateRemaining();
+        updatePanel();
         
-        // 次のセルへ移動するなどの細かい挙動は必要に応じて追加可能
+        // 入力したら自動で次のセル（右、行が変わる場合は次の行の最初）へ移動
+        let currentIndex = parseInt(input.dataset.index);
+        if (currentIndex < 80) {
+            cells[currentIndex + 1].focus();
+        }
     }
 
-    // 残り数字の計算と右側パネルの更新
-    function updateRemaining() {
-        const counts = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0};
-        cells.forEach(input => {
-            const val = parseInt(input.value);
-            if (counts[val] !== undefined) {
-                counts[val]++;
-            }
-        });
-
+    // 各行に入っていない数字を計算して右側パネルを更新
+    function updatePanel() {
         rightPanelEl.innerHTML = '';
-        for (let i = 1; i <= 9; i++) {
-            const rem = 9 - counts[i];
-            const item = document.createElement('div');
-            item.classList.add('remaining-item');
-            item.innerHTML = `<span>${i}:</span> <span style="color:${rem === 0 ? '#ccc' : '#000'}">残り ${rem}</span>`;
-            rightPanelEl.innerHTML += item.outerHTML;
+        
+        for (let r = 0; r < 9; r++) {
+            const rowNums = new Set();
+            // 行の数字を集める
+            for (let c = 0; c < 9; c++) {
+                const val = parseInt(cells[r * 9 + c].value);
+                if (val >= 1 && val <= 9) {
+                    rowNums.add(val);
+                }
+            }
+
+            // 1〜9の中で、まだこの行に含まれていないものを探す
+            const missing = [];
+            for (let n = 1; n <= 9; n++) {
+                if (!rowNums.has(n)) {
+                    missing.push(n);
+                }
+            }
+
+            const rowDiv = document.createElement('div');
+            rowDiv.classList.add('missing-row');
+            rowDiv.innerHTML = `
+                <span class="missing-label">行${r + 1}</span>
+                <span class="missing-nums">${missing.join(' ')}</span>
+            `;
+            rightPanelEl.appendChild(rowDiv);
         }
     }
 
     function resetGrid() {
-        cells.forEach(input => input.value = '');
-        updateRemaining();
+        if (confirm("盤面をすべてリセットしますか？")) {
+            cells.forEach(input => input.value = '');
+            updatePanel();
+        }
     }
 
     initGrid();

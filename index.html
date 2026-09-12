@@ -75,22 +75,22 @@
         .cell:nth-child(n+19):nth-child(-n+27),
         .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid #333; }
 
-        /* 右側：行（横）の未入力数字（18行グリッドにして各セルに2行で対応） */
+        /* 右側：行（横）の未入力数字（9行グリッドに戻し、各行内で2行に均等分割） */
         .right-panel {
             grid-column: 2;
             grid-row: 1;
             display: grid;
-            grid-template-rows: repeat(18, 1fr);
+            grid-template-rows: repeat(9, 1fr);
             padding-left: 4px;
         }
-        .missing-row-part {
-            grid-row: span 2;
+        .missing-row {
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            justify-content: center;
             font-size: 9px;
             font-weight: bold;
             color: #0066cc;
-            letter-spacing: 0px;
+            line-height: 1.2;
             white-space: nowrap;
         }
 
@@ -107,7 +107,7 @@
             justify-content: center;
         }
         .col-nums {
-            font-size: 10px;
+            font-size: 9px;
             color: #e65100;
             font-weight: bold;
             text-align: center;
@@ -247,7 +247,7 @@
     }
 
     function updatePanels() {
-        // 行（横）の計算：2行に分割して配置
+        // 行（横）の計算：9行の各ボックス内で2行に分けて綺麗に配置
         rightPanelEl.innerHTML = '';
         for (let r = 0; r < 9; r++) {
             const rowNums = new Set();
@@ -264,15 +264,10 @@
             const part1 = missing.slice(0, mid).join(' ');
             const part2 = missing.slice(mid).join(' ');
 
-            const div1 = document.createElement('div');
-            div1.classList.add('missing-row-part');
-            div1.textContent = part1;
-            rightPanelEl.appendChild(div1);
-
-            const div2 = document.createElement('div');
-            div2.classList.add('missing-row-part');
-            div2.textContent = part2;
-            rightPanelEl.appendChild(div2);
+            const rowDiv = document.createElement('div');
+            rowDiv.classList.add('missing-row');
+            rowDiv.innerHTML = `<span>${part1}</span><span>${part2}</span>`;
+            rightPanelEl.appendChild(rowDiv);
         }
 
         // 列（縦）の計算

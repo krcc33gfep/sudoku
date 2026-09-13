@@ -79,15 +79,15 @@
         }
 
         .cell.selected {
-            background: #1e355c !important;
+            background: #1f3a68 !important;
         }
 
-        /* ハイライトされた数字が入っているセルの背景色（ダークアンバー系） */
+        /* ハイライトされた数字が入っているセルの背景色（落ち着いたマットなダークグレー） */
         .cell.cell-highlighted {
-            background: #3d2c16;
+            background: #2b2b2b;
         }
 
-        /* 各セル内の9分割サブグリッド (通常メモ: 見やすい明るめのグレー) */
+        /* 各セル内の9分割サブグリッド (通常メモ) */
         .sub-num {
             display: flex;
             align-items: center;
@@ -106,7 +106,7 @@
             visibility: hidden;
         }
 
-        /* ハイライトされた小さな数字（色弱でも見やすいクリアな青系・太字） */
+        /* ハイライトされた小さな数字（元の上品な青系・太字） */
         .sub-num.highlighted {
             color: #58b2ff !important;
             font-weight: bold !important;
@@ -131,7 +131,7 @@
         }
         .cell-input-overlay:focus {
             outline: none;
-            background: transparent; /* フォーカス時はセルの背景色（selected）を優先するため透過 */
+            background: transparent;
         }
 
         /* テンキーエリア */
@@ -378,7 +378,6 @@
     }
 
     function updateAllCellsDisplay() {
-        // まず全セルのハイライト状態をリセット
         cellElements.forEach(item => {
             item.cell.classList.remove('has-value');
             item.cell.classList.remove('cell-highlighted');
@@ -394,18 +393,15 @@
             });
         });
 
-        // アクティブなハイライト数字と、セルに入っている数字が一致する場合の処理
         for (let i = 0; i < 81; i++) {
             const val = cellsData[i];
             
-            // 確定した数字が存在する場合
             if (val) {
                 const targetItem = cellElements[i];
                 targetItem.cell.classList.add('has-value');
 
                 const targetDigit = parseInt(val);
                 
-                // もしその確定数字が現在アクティブなハイライトに含まれていたら、セルの背景色を変える
                 if (activeHighlights.has(targetDigit)) {
                     targetItem.cell.classList.add('cell-highlighted');
                 }

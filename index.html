@@ -101,13 +101,13 @@
             visibility: hidden;
         }
 
-        /* ハイライトされた小文字（青系・太字） */
+        /* ハイライトされた小さな数字（青系・太字） */
         .sub-num.highlighted {
             color: #4da6ff !important;
             font-weight: bold !important;
         }
 
-        /* 確定した数字を表示する場合のオーバーレイ（必要であればここも青系に合わせる場合は変更可能ですが、今回はそのまま） */
+        /* 確定した数字を表示する場合のオーバーレイ（もとの黄色系に維持） */
         .cell-input-overlay {
             position: absolute;
             top: 0;
@@ -120,7 +120,7 @@
             font-weight: bold;
             background: transparent;
             font-variant-numeric: tabular-nums;
-            color: #4da6ff;
+            color: #b3b300;
             caret-color: transparent;
             z-index: 2;
         }

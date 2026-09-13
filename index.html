@@ -13,7 +13,7 @@
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #121212;
+            background-color: #141414;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -41,29 +41,29 @@
             display: grid;
             grid-template-columns: repeat(9, 1fr);
             grid-template-rows: repeat(9, 1fr);
-            border: 2px solid #fff;
-            background: #1e1e1e;
+            border: 2px solid #ffffff;
+            background: #1c1c1c;
             gap: 0;
             width: 100%;
             aspect-ratio: 1 / 1;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.6);
             border-radius: 4px;
             overflow: hidden;
         }
         .cell {
-            background: #1e1e1e;
+            background: #1c1c1c;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
             position: relative;
             cursor: pointer;
-            border-right: 1px solid #fff;
-            border-bottom: 1px solid #fff;
+            border-right: 1px solid #ffffff;
+            border-bottom: 1px solid #ffffff;
         }
 
         /* 3x3ブロックの右側の境界線を太くする (3列目、6列目) */
         .cell:nth-child(3n):not(:nth-child(9n)) {
-            border-right: 2px solid #fff;
+            border-right: 2px solid #ffffff;
         }
         .cell:nth-child(9n) {
             border-right: none;
@@ -72,24 +72,24 @@
         /* 3x3ブロックの下側の境界線を太くする (3行目、6行目) */
         .cell:nth-child(n+19):nth-child(-n+27),
         .cell:nth-child(n+46):nth-child(-n+54) {
-            border-bottom: 2px solid #fff;
+            border-bottom: 2px solid #ffffff;
         }
         .cell:nth-child(n+73):nth-child(-n+81) {
             border-bottom: none;
         }
 
         .cell.selected {
-            background: #263859;
+            background: #1e355c;
         }
 
-        /* 各セル内の9分割サブグリッド */
+        /* 各セル内の9分割サブグリッド (通常メモ: 見やすい明るめのグレー) */
         .sub-num {
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: min(3.5vw, 15px);
             line-height: 1;
-            color: #cccccc;
+            color: #b0b0b0;
             font-weight: normal;
             font-variant-numeric: tabular-nums;
             visibility: visible;
@@ -101,13 +101,13 @@
             visibility: hidden;
         }
 
-        /* ハイライトされた小さな数字（青系・太字） */
+        /* ハイライトされた小さな数字（色弱でも見やすいクリアな青系・太字） */
         .sub-num.highlighted {
-            color: #4da6ff !important;
+            color: #58b2ff !important;
             font-weight: bold !important;
         }
 
-        /* 確定した数字を表示する場合のオーバーレイ（黄色系・細字に変更） */
+        /* 確定した数字を表示する場合のオーバーレイ（ゴールド系・細字） */
         .cell-input-overlay {
             position: absolute;
             top: 0;
@@ -120,13 +120,13 @@
             font-weight: normal;
             background: transparent;
             font-variant-numeric: tabular-nums;
-            color: #b3b300;
+            color: #ffd700;
             caret-color: transparent;
             z-index: 2;
         }
         .cell-input-overlay:focus {
             outline: none;
-            background: #1c3b47;
+            background: #1b3d54;
         }
 
         /* テンキーエリア */
@@ -143,8 +143,8 @@
             width: 100%;
         }
         .num-btn {
-            background: #2a2a2a;
-            border: 1px solid #444;
+            background: #252525;
+            border: 1px solid #3d3d3d;
             border-radius: 6px;
             aspect-ratio: 1 / 1;
             font-size: 18px;
@@ -158,7 +158,7 @@
             font-variant-numeric: tabular-nums;
         }
         .num-btn:active {
-            background: #3a3a3a;
+            background: #363636;
         }
         .num-btn.clear-btn {
             background: #8b0000;
@@ -175,13 +175,13 @@
             width: 100%;
         }
         .hl-btn {
-            background: #1f2d3d;
-            border: 1px solid #324c66;
+            background: #1a2736;
+            border: 1px solid #283d54;
             border-radius: 6px;
             aspect-ratio: 1 / 1;
             font-size: 14px;
             font-weight: bold;
-            color: #a0c4df;
+            color: #8cb8e6;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -190,12 +190,12 @@
             font-variant-numeric: tabular-nums;
         }
         .hl-btn:active {
-            background: #2d435b;
+            background: #263c54;
         }
         .hl-btn.active {
-            background: #4da6ff;
+            background: #58b2ff;
             color: #000;
-            border-color: #2680d9;
+            border-color: #318edb;
         }
 
         .controls {
@@ -205,9 +205,9 @@
             gap: 6px;
         }
         .control-btn {
-            background: #333;
-            color: #aaa;
-            border: 1px solid #444;
+            background: #282828;
+            color: #b0b0b0;
+            border: 1px solid #3d3d3d;
             border-radius: 6px;
             padding: 8px 12px;
             font-size: 12px;
@@ -215,12 +215,12 @@
             cursor: pointer;
         }
         .control-btn:active {
-            background: #444;
+            background: #383838;
         }
         .control-btn.lock-active {
-            background: #1a4d2e;
+            background: #144d2d;
             color: #7ef8a8;
-            border-color: #277747;
+            border-color: #216d42;
         }
     </style>
 </head>
@@ -255,7 +255,7 @@
             <button class="hl-btn" id="hl-7" onclick="toggleHighlight(7)">7</button>
             <button class="hl-btn" id="hl-8" onclick="toggleHighlight(8)">8</button>
             <button class="hl-btn" id="hl-9" onclick="toggleHighlight(9)">9</button>
-            <button class="hl-btn" style="background:#333; color:#aaa; border-color:#444; font-size: 11px;" onclick="clearAllHighlights()">解除</button>
+            <button class="hl-btn" style="background:#282828; color:#b0b0b0; border-color:#3d3d3d; font-size: 11px;" onclick="clearAllHighlights()">解除</button>
         </div>
 
         <!-- コントロールボタン群 -->

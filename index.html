@@ -43,7 +43,7 @@
             grid-template-rows: repeat(9, 1fr);
             border: 2px solid #fff;
             background: #1e1e1e;
-            gap: 0; /* gapをなくしてセル同士のボーダーで線を表現する */
+            gap: 0;
             width: 100%;
             aspect-ratio: 1 / 1;
             box-shadow: 0 4px 16px rgba(0,0,0,0.5);
@@ -57,19 +57,29 @@
             grid-template-rows: repeat(3, 1fr);
             position: relative;
             cursor: pointer;
-            /* 全セルに基本の白い細い境界線を設定 */
-            border-right: 1px solid #fff;
-            border-bottom: 1px solid #fff;
+            /* 通常のセル内枠線は細く */
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* 3x3ブロックの右側の境界線を太くする (3列目、6列目) */
+        .cell:nth-child(3n):not(:nth-child(9n)) {
+            border-right: 2px solid #fff;
         }
         /* 9列目の右ボーダーは不要なので消す */
         .cell:nth-child(9n) {
             border-right: none;
         }
+
+        /* 3x3ブロックの下側の境界線を太くする (3行目、6行目) */
+        .cell:nth-child(n+19):nth-child(-n+27),
+        .cell:nth-child(n+46):nth-child(-n+54) {
+            border-bottom: 2px solid #fff;
+        }
         /* 9行目の下ボーダーは不要なので消す */
         .cell:nth-child(n+73):nth-child(-n+81) {
             border-bottom: none;
         }
-        /* 3x3ブロックの区切りを少し太くしたい場合はここで調整可能だが、今回はすべて白線で統一 */
 
         .cell.selected {
             background: #263859;

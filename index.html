@@ -41,7 +41,7 @@
             display: grid;
             grid-template-columns: repeat(9, 1fr);
             grid-template-rows: repeat(9, 1fr);
-            border: 3px solid #333;
+            border: 2px solid #333;
             background: #333;
             gap: 1px;
             width: 100%;
@@ -62,7 +62,7 @@
             background: #d0e8ff;
         }
 
-        /* 各セル内の9分割サブグリッド：余白を極限まで削り、できる限り大きく表示 */
+        /* 各セル内の9分割サブグリッド */
         .sub-num {
             display: flex;
             align-items: center;
@@ -98,10 +98,10 @@
             background: rgba(208, 232, 255, 0.8);
         }
 
-        /* 太線（3x3ブロックの区切り） */
-        .cell:nth-child(3n):not(:nth-child(9n)) { border-right: 2px solid #333; }
+        /* 3x3ブロックの区切り線（1pxに変更） */
+        .cell:nth-child(3n):not(:nth-child(9n)) { border-right: 1px solid #333; }
         .cell:nth-child(n+19):nth-child(-n+27),
-        .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid #333; }
+        .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 1px solid #333; }
 
         /* テンキーエリア */
         .numpad-container {

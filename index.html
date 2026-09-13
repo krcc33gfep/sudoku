@@ -82,7 +82,7 @@
             background: #263859;
         }
 
-        /* 各セル内の9分割サブグリッド（普通の細さ・白色に変更） */
+        /* 各セル内の9分割サブグリッド */
         .sub-num {
             display: flex;
             align-items: center;
@@ -101,7 +101,7 @@
             visibility: hidden;
         }
 
-        /* 確定した数字を表示する場合のオーバーレイ */
+        /* 確定した数字を表示する場合のオーバーレイ（caret-colorでカーソルを透明にして非表示に） */
         .cell-input-overlay {
             position: absolute;
             top: 0;
@@ -115,12 +115,13 @@
             background: transparent;
             font-variant-numeric: tabular-nums;
             color: #FFFF00;
+            caret-color: transparent; /* カーソルを非表示にする設定 */
             z-index: 2;
         }
+        /* フォーカス時の背景色を黒寄りのダークシアンに変更 */
         .cell-input-overlay:focus {
             outline: none;
-            background: #00FFFF;
-            color: #000;
+            background: #1c3b47;
         }
 
         /* テンキーエリア */

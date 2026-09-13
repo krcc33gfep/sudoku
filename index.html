@@ -62,13 +62,14 @@
             background: #d0e8ff;
         }
 
-        /* 各セル内の9分割されたサブグリッド（候補表示用） */
+        /* 各セル内の9分割サブグリッド：余白を極限まで削り、できる限り大きく表示 */
         .sub-num {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 8px;
-            color: #bbb;
+            font-size: min(3.5vw, 15px);
+            line-height: 1;
+            color: #ccc;
             font-weight: bold;
             font-variant-numeric: tabular-nums;
         }
@@ -76,7 +77,7 @@
             color: #0066cc;
         }
 
-        /* 確定した数字を表示する場合のスタイル（必要に応じて重ねる等） */
+        /* 確定した数字を表示する場合のオーバーレイ */
         .cell-input-overlay {
             position: absolute;
             top: 0;
@@ -85,7 +86,7 @@
             height: 100%;
             border: none;
             text-align: center;
-            font-size: 24px;
+            font-size: min(8vw, 32px);
             font-weight: bold;
             background: transparent;
             font-variant-numeric: tabular-nums;
@@ -183,7 +184,7 @@
 <script>
     let selectedCellIndex = null;
     const gridEl = document.getElementById('grid');
-    let cellsData = Array(81).fill(''); // 確定した数字を保持
+    let cellsData = Array(81).fill('');
     let cellElements = [];
 
     function initGrid() {
@@ -192,7 +193,6 @@
             cell.classList.add('cell');
             cell.dataset.index = i;
 
-            // 各セル内に1〜9の9分割スロットを作成
             for (let n = 1; n <= 9; n++) {
                 const subNum = document.createElement('div');
                 subNum.classList.add('sub-num');
@@ -201,7 +201,6 @@
                 cell.appendChild(subNum);
             }
 
-            // 数字入力用の透明オーバーレイ入力欄
             const input = document.createElement('input');
             input.type = 'text';
             input.inputMode = 'none';
@@ -235,7 +234,6 @@
         const cellEl = cellElements[index].cell;
         const subNums = cellEl.querySelectorAll('.sub-num');
 
-        // 仮：現時点では数字が入力されたら該当のサブ数字の色を変えるなどのデモ動作、あるいは非表示にする等の調整が可能
         subNums.forEach(sub => {
             const digit = sub.dataset.digit;
             if (val && digit === val) {

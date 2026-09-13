@@ -73,8 +73,9 @@
             font-weight: bold;
             font-variant-numeric: tabular-nums;
         }
-        .sub-num.active {
-            color: #0066cc;
+        /* 数字が入力されたらセル内の小さい数字全体を非表示にする */
+        .cell.has-value .sub-num {
+            visibility: hidden;
         }
 
         /* 確定した数字を表示する場合のオーバーレイ */
@@ -98,7 +99,7 @@
             background: rgba(208, 232, 255, 0.8);
         }
 
-        /* 3x3ブロックの区切り線（1pxに変更） */
+        /* 3x3ブロックの区切り線（1px） */
         .cell:nth-child(3n):not(:nth-child(9n)) { border-right: 1px solid #333; }
         .cell:nth-child(n+19):nth-child(-n+27),
         .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 1px solid #333; }
@@ -197,7 +198,6 @@
                 const subNum = document.createElement('div');
                 subNum.classList.add('sub-num');
                 subNum.textContent = n;
-                subNum.dataset.digit = n;
                 cell.appendChild(subNum);
             }
 
@@ -210,7 +210,7 @@
 
             input.addEventListener('focus', () => {
                 if (selectedCellIndex !== null && cellElements[selectedCellIndex]) {
-                    cellElements[selectedCellIndex].classList.remove('selected');
+                    cellElements[selectedCellIndex].cell.classList.remove('selected');
                 }
                 selectedCellIndex = i;
                 cell.classList.add('selected');
@@ -232,16 +232,12 @@
     function updateCellDisplay(index) {
         const val = cellsData[index];
         const cellEl = cellElements[index].cell;
-        const subNums = cellEl.querySelectorAll('.sub-num');
 
-        subNums.forEach(sub => {
-            const digit = sub.dataset.digit;
-            if (val && digit === val) {
-                sub.classList.add('active');
-            } else {
-                sub.classList.remove('active');
-            }
-        });
+        if (val) {
+            cellEl.classList.add('has-value');
+        } else {
+            cellEl.classList.remove('has-value');
+        }
     }
 
     function inputNumber(num) {

@@ -107,7 +107,7 @@
             font-weight: bold !important;
         }
 
-        /* 確定した数字を表示する場合のオーバーレイ（トーンを落とした黄色 #b3b300 に変更） */
+        /* 確定した数字を表示する場合のオーバーレイ */
         .cell-input-overlay {
             position: absolute;
             top: 0;
@@ -274,7 +274,37 @@
     
     let activeHighlights = new Set();
 
+    // ローカルストレージからデータを読み込む
+    function loadFromStorage() {
+        const savedData = localStorage.getItem('sudoku_cells_data');
+        if (savedData) {
+            try {
+                cellsData = JSON.parse(savedData);
+            } catch (e) {
+                cellsData = Array(81).fill('');
+            }
+        }
+
+        const savedHighlights = localStorage.getItem('sudoku_highlights');
+        if (savedHighlights) {
+            try {
+                const arr = JSON.parse(savedHighlights);
+                activeHighlights = new Set(arr);
+            } catch (e) {
+                activeHighlights = new Set();
+            }
+        }
+    }
+
+    // ローカルストレージにデータを保存する
+    function saveToStorage() {
+        localStorage.setItem('sudoku_cells_data', JSON.stringify(cellsData));
+        localStorage.setItem('sudoku_highlights', JSON.stringify(Array.from(activeHighlights)));
+    }
+
     function initGrid() {
+        loadFromStorage();
+
         for (let i = 0; i < 81; i++) {
             const cell = document.createElement('div');
             cell.classList.add('cell');
@@ -307,6 +337,7 @@
                 const val = input.value.replace(/[^1-9]/g, '');
                 input.value = val ? val[0] : '';
                 cellsData[i] = input.value;
+                saveToStorage();
                 updateAllCellsDisplay();
             });
 
@@ -314,6 +345,14 @@
             gridEl.appendChild(cell);
             cellElements.push({ cell, input });
         }
+
+        // 保存されていたハイライトボタンの状態をUIに反映
+        activeHighlights.forEach(num => {
+            const btn = document.getElementById(`hl-${num}`);
+            if (btn) btn.classList.add('active');
+        });
+
+        updateAllCellsDisplay();
     }
 
     function updateAllCellsDisplay() {
@@ -381,6 +420,7 @@
             activeHighlights.add(num);
             btn.classList.add('active');
         }
+        saveToStorage();
         updateAllCellsDisplay();
     }
 
@@ -390,6 +430,7 @@
             const btn = document.getElementById(`hl-${n}`);
             if (btn) btn.classList.remove('active');
         }
+        saveToStorage();
         updateAllCellsDisplay();
     }
 
@@ -399,6 +440,7 @@
         target.input.value = num;
         cellsData[selectedCellIndex] = num;
         
+        saveToStorage();
         updateAllCellsDisplay();
         
         if (selectedCellIndex < 80 && num !== '') {
@@ -411,6 +453,8 @@
             cellsData.fill('');
             cellElements.forEach(item => item.input.value = '');
             clearAllHighlights();
+            localStorage.removeItem('sudoku_cells_data');
+            localStorage.removeItem('sudoku_highlights');
             updateAllCellsDisplay();
         }
     }

@@ -72,9 +72,14 @@
             color: #ccc;
             font-weight: bold;
             font-variant-numeric: tabular-nums;
+            visibility: visible; /* デフォルトは表示 */
         }
-        /* 数字が入力されたらセル内の小さい数字全体を非表示にする */
+        /* 自セルに数字が入力されたら、そのセルのサブ数字はすべて非表示（位置は保持） */
         .cell.has-value .sub-num {
+            visibility: hidden;
+        }
+        /* 縦横の連動で非表示にする場合 */
+        .sub-num.filtered-out {
             visibility: hidden;
         }
 
@@ -198,6 +203,7 @@
                 const subNum = document.createElement('div');
                 subNum.classList.add('sub-num');
                 subNum.textContent = n;
+                subNum.dataset.digit = n;
                 cell.appendChild(subNum);
             }
 
@@ -220,7 +226,7 @@
                 const val = input.value.replace(/[^1-9]/g, '');
                 input.value = val ? val[0] : '';
                 cellsData[i] = input.value;
-                updateCellDisplay(i);
+                updateAllCellsDisplay();
             });
 
             cell.appendChild(input);
@@ -229,14 +235,50 @@
         }
     }
 
-    function updateCellDisplay(index) {
-        const val = cellsData[index];
-        const cellEl = cellElements[index].cell;
+    // 盤面全体を走査し、確定した数字に基づき各セルのサブ数字の表示・非表示を判定する
+    function updateAllCellsDisplay() {
+        // まず全マスの「has-value」と「filtered-out」をリセット
+        cellElements.forEach(item => {
+            item.cell.classList.remove('has-value');
+            item.subNums = item.cell.querySelectorAll('.sub-num');
+            item.subNums.forEach(sub => sub.classList.remove('filtered-out'));
+        });
 
-        if (val) {
-            cellEl.classList.add('has-value');
-        } else {
-            cellEl.classList.remove('has-value');
+        // 入力されている全てのセルについて、縦横の同数字を非表示にするルールを適用
+        for (let i = 0; i < 81; i++) {
+            const val = cellsData[i];
+            if (!val) continue;
+
+            const targetItem = cellElements[i];
+            targetItem.cell.classList.add('has-value');
+
+            const r = Math.floor(i / 9);
+            const c = i % 9;
+            const targetDigit = parseInt(val);
+
+            // 同じ行（横）のセルを走査
+            for (let col = 0; col < 9; col++) {
+                const idx = r * 9 + col;
+                hideSubNum(idx, targetDigit);
+            }
+
+            // 同じ列（縦）のセルを走査
+            for (let row = 0; row < 9; row++) {
+                const idx = row * 9 + c;
+                hideSubNum(idx, targetDigit);
+            }
+        }
+    }
+
+    // 指定したセルの特定のサブ数字（digit）を非表示にする補助関数
+    function hideSubNum(cellIndex, digit) {
+        const cellEl = cellElements[cellIndex].cell;
+        // すでに自セルに数字が入っている場合はクラス制御に任せる
+        if (cellsData[cellIndex]) return;
+
+        const subNumEl = cellEl.querySelector(`.sub-num[data-digit="${digit}"]`);
+        if (subNumEl) {
+            subNumEl.classList.add('filtered-out');
         }
     }
 
@@ -245,7 +287,8 @@
         const target = cellElements[selectedCellIndex];
         target.input.value = num;
         cellsData[selectedCellIndex] = num;
-        updateCellDisplay(selectedCellIndex);
+        
+        updateAllCellsDisplay();
         
         if (selectedCellIndex < 80 && num !== '') {
             cellElements[selectedCellIndex + 1].input.focus();
@@ -255,10 +298,8 @@
     function resetGrid() {
         if (confirm("盤面をすべてリセットしますか？")) {
             cellsData.fill('');
-            cellElements.forEach((item, idx) => {
-                item.input.value = '';
-                updateCellDisplay(idx);
-            });
+            cellElements.forEach(item => item.input.value = '');
+            updateAllCellsDisplay();
         }
     }
 

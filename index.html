@@ -101,7 +101,13 @@
             visibility: hidden;
         }
 
-        /* 確定した数字を表示する場合のオーバーレイ（caret-colorでカーソルを透明にして非表示に） */
+        /* ハイライトされた小文字（太字・黄色） */
+        .sub-num.highlighted {
+            color: #FFFF00 !important;
+            font-weight: bold !important;
+        }
+
+        /* 確定した数字を表示する場合のオーバーレイ */
         .cell-input-overlay {
             position: absolute;
             top: 0;
@@ -115,10 +121,9 @@
             background: transparent;
             font-variant-numeric: tabular-nums;
             color: #FFFF00;
-            caret-color: transparent; /* カーソルを非表示にする設定 */
+            caret-color: transparent;
             z-index: 2;
         }
-        /* フォーカス時の背景色を黒寄りのダークシアンに変更 */
         .cell-input-overlay:focus {
             outline: none;
             background: #1c3b47;
@@ -162,6 +167,44 @@
             font-size: 15px;
         }
 
+        /* 追加したハイライト専用のボタン列用スタイル */
+        .highlight-pad {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 4px;
+            width: 100%;
+        }
+        .hl-btn {
+            background: #1f2d3d;
+            border: 1px solid #324c66;
+            border-radius: 6px;
+            padding: 8px 0;
+            font-size: 14px;
+            font-weight: bold;
+            color: #a0c4df;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-variant-numeric: tabular-nums;
+        }
+        .hl-btn:active {
+            background: #2d435b;
+        }
+        .hl-btn.active {
+            background: #f1c40f;
+            color: #000;
+            border-color: #d4ac0d;
+        }
+        .hl-label {
+            grid-column: span 10;
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+            margin-top: -2px;
+        }
+
         .controls {
             width: 100%;
             display: flex;
@@ -188,6 +231,7 @@
     <div class="sudoku-grid" id="grid"></div>
 
     <div class="numpad-container">
+        <!-- 既存の入力用テンキー -->
         <div class="numpad">
             <button class="num-btn" onclick="inputNumber(1)">1</button>
             <button class="num-btn" onclick="inputNumber(2)">2</button>
@@ -200,6 +244,22 @@
             <button class="num-btn" onclick="inputNumber(9)">9</button>
             <button class="num-btn clear-btn" onclick="inputNumber('')">C</button>
         </div>
+
+        <!-- 追加したハイライト用のもう1列 -->
+        <div class="highlight-pad">
+            <button class="hl-btn" id="hl-1" onclick="toggleHighlight(1)">1</button>
+            <button class="hl-btn" id="hl-2" onclick="toggleHighlight(2)">2</button>
+            <button class="hl-btn" id="hl-3" onclick="toggleHighlight(3)">3</button>
+            <button class="hl-btn" id="hl-4" onclick="toggleHighlight(4)">4</button>
+            <button class="hl-btn" id="hl-5" onclick="toggleHighlight(5)">5</button>
+            <button class="hl-btn" id="hl-6" onclick="toggleHighlight(6)">6</button>
+            <button class="hl-btn" id="hl-7" onclick="toggleHighlight(7)">7</button>
+            <button class="hl-btn" id="hl-8" onclick="toggleHighlight(8)">8</button>
+            <button class="hl-btn" id="hl-9" onclick="toggleHighlight(9)">9</button>
+            <button class="hl-btn" style="background:#333; color:#aaa; border-color:#444;" onclick="clearAllHighlights()">解除</button>
+        </div>
+        <div class="hl-label">▼ タップした数字のメモを太字の黄色で強調表示</div>
+
         <div class="controls">
             <button class="reset-btn" onclick="resetGrid()">すべてリセット</button>
         </div>
@@ -211,6 +271,9 @@
     const gridEl = document.getElementById('grid');
     let cellsData = Array(81).fill('');
     let cellElements = [];
+    
+    // 現在ハイライトされている数字のセット
+    let activeHighlights = new Set();
 
     function initGrid() {
         for (let i = 0; i < 81; i++) {
@@ -258,7 +321,16 @@
         cellElements.forEach(item => {
             item.cell.classList.remove('has-value');
             item.subNums = item.cell.querySelectorAll('.sub-num');
-            item.subNums.forEach(sub => sub.classList.remove('filtered-out'));
+            item.subNums.forEach(sub => {
+                sub.classList.remove('filtered-out');
+                // ハイライト状態の復元
+                const digit = parseInt(sub.dataset.digit);
+                if (activeHighlights.has(digit)) {
+                    sub.classList.add('highlighted');
+                } else {
+                    sub.classList.remove('highlighted');
+                }
+            });
         });
 
         for (let i = 0; i < 81; i++) {
@@ -302,6 +374,29 @@
         }
     }
 
+    // ハイライトの切り替え
+    function toggleHighlight(num) {
+        const btn = document.getElementById(`hl-${num}`);
+        if (activeHighlights.has(num)) {
+            activeHighlights.delete(num);
+            btn.classList.remove('active');
+        } else {
+            activeHighlights.add(num);
+            btn.classList.add('active');
+        }
+        updateAllCellsDisplay();
+    }
+
+    // すべてのハイライトを解除
+    function clearAllHighlights() {
+        activeHighlights.clear();
+        for (let n = 1; n <= 9; n++) {
+            const btn = document.getElementById(`hl-${n}`);
+            if (btn) btn.classList.remove('active');
+        }
+        updateAllCellsDisplay();
+    }
+
     function inputNumber(num) {
         if (selectedCellIndex === null) return;
         const target = cellElements[selectedCellIndex];
@@ -319,6 +414,7 @@
         if (confirm("盤面をすべてリセットしますか？")) {
             cellsData.fill('');
             cellElements.forEach(item => item.input.value = '');
+            clearAllHighlights();
             updateAllCellsDisplay();
         }
     }

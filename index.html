@@ -146,7 +146,7 @@
             background: #2a2a2a;
             border: 1px solid #444;
             border-radius: 6px;
-            padding: 12px 0;
+            aspect-ratio: 1 / 1; /* 正方形にする */
             font-size: 18px;
             font-weight: bold;
             color: #e0e0e0;
@@ -167,7 +167,7 @@
             font-size: 15px;
         }
 
-        /* ハイライト専用のボタン列用スタイル */
+        /* ハイライト専用のボタン列用スタイル（正方形にそろえる） */
         .highlight-pad {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
@@ -178,7 +178,7 @@
             background: #1f2d3d;
             border: 1px solid #324c66;
             border-radius: 6px;
-            padding: 8px 0;
+            aspect-ratio: 1 / 1; /* 正方形にする */
             font-size: 14px;
             font-weight: bold;
             color: #a0c4df;
@@ -244,7 +244,7 @@
             <button class="num-btn clear-btn" onclick="inputNumber('')">C</button>
         </div>
 
-        <!-- ハイライト用の列 -->
+        <!-- ハイライト用の列（すべて正方形） -->
         <div class="highlight-pad">
             <button class="hl-btn" id="hl-1" onclick="toggleHighlight(1)">1</button>
             <button class="hl-btn" id="hl-2" onclick="toggleHighlight(2)">2</button>
@@ -255,14 +255,14 @@
             <button class="hl-btn" id="hl-7" onclick="toggleHighlight(7)">7</button>
             <button class="hl-btn" id="hl-8" onclick="toggleHighlight(8)">8</button>
             <button class="hl-btn" id="hl-9" onclick="toggleHighlight(9)">9</button>
-            <button class="hl-btn" style="background:#333; color:#aaa; border-color:#444;" onclick="clearAllHighlights()">解除</button>
+            <button class="hl-btn" style="background:#333; color:#aaa; border-color:#444; font-size: 11px;" onclick="clearAllHighlights()">解除</button>
         </div>
 
-        <!-- コントロールボタン群（ロック・戻す・すべてリセット） -->
+        <!-- コントロールボタン群 -->
         <div class="controls">
             <button class="control-btn" id="lock-btn" onclick="toggleLock()">状態ロック</button>
             <button class="control-btn" id="revert-btn" onclick="revertToLock()" style="display:none;">やり直す</button>
-            <button class="control-btn" onclick="resetGrid()">すべてリセット</button>
+            <button class="control-btn" onclick="resetGrid()">リセット</button>
         </div>
     </div>
 </div>
@@ -274,8 +274,6 @@
     let cellElements = [];
     
     let activeHighlights = new Set();
-    
-    // ロック機能用変数
     let isLocked = false;
     let lockedData = null;
 
@@ -299,7 +297,6 @@
             }
         }
 
-        // ロックデータの読み込み
         const savedLock = localStorage.getItem('sudoku_locked_data');
         if (savedLock) {
             try {
@@ -468,17 +465,14 @@
         }
     }
 
-    // ロック機能の切り替え（ON/OFF）
     function toggleLock() {
         const lockBtn = document.getElementById('lock-btn');
         if (!isLocked) {
-            // ロック実行
             lockedData = [...cellsData];
             isLocked = true;
             lockBtn.textContent = "ロック解除";
             lockBtn.classList.add('lock-active');
         } else {
-            // ロック解除
             if (confirm("ロックを解除して現在の状態を新しい基準にしますか？")) {
                 lockedData = null;
                 isLocked = false;
@@ -490,7 +484,6 @@
         updateLockButtonUI();
     }
 
-    // ロック時点の盤面に戻す
     function revertToLock() {
         if (!isLocked || !lockedData) return;
         if (confirm("ロック直後の状態に戻しますか？（その後の入力は破棄されます）")) {
@@ -503,7 +496,6 @@
         }
     }
 
-    // ロックボタンと「やり直す」ボタンの表示状態を更新
     function updateLockButtonUI() {
         const lockBtn = document.getElementById('lock-btn');
         const revertBtn = document.getElementById('revert-btn');

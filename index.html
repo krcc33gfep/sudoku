@@ -79,7 +79,12 @@
         }
 
         .cell.selected {
-            background: #1e355c;
+            background: #1e355c !important;
+        }
+
+        /* ハイライトされた数字が入っているセルの背景色（ダークアンバー系） */
+        .cell.cell-highlighted {
+            background: #3d2c16;
         }
 
         /* 各セル内の9分割サブグリッド (通常メモ: 見やすい明るめのグレー) */
@@ -126,7 +131,7 @@
         }
         .cell-input-overlay:focus {
             outline: none;
-            background: #1b3d54;
+            background: transparent; /* フォーカス時はセルの背景色（selected）を優先するため透過 */
         }
 
         /* テンキーエリア */
@@ -373,8 +378,10 @@
     }
 
     function updateAllCellsDisplay() {
+        // まず全セルのハイライト状態をリセット
         cellElements.forEach(item => {
             item.cell.classList.remove('has-value');
+            item.cell.classList.remove('cell-highlighted');
             item.subNums = item.cell.querySelectorAll('.sub-num');
             item.subNums.forEach(sub => {
                 sub.classList.remove('filtered-out');
@@ -387,32 +394,41 @@
             });
         });
 
+        // アクティブなハイライト数字と、セルに入っている数字が一致する場合の処理
         for (let i = 0; i < 81; i++) {
             const val = cellsData[i];
-            if (!val) continue;
+            
+            // 確定した数字が存在する場合
+            if (val) {
+                const targetItem = cellElements[i];
+                targetItem.cell.classList.add('has-value');
 
-            const targetItem = cellElements[i];
-            targetItem.cell.classList.add('has-value');
+                const targetDigit = parseInt(val);
+                
+                // もしその確定数字が現在アクティブなハイライトに含まれていたら、セルの背景色を変える
+                if (activeHighlights.has(targetDigit)) {
+                    targetItem.cell.classList.add('cell-highlighted');
+                }
 
-            const r = Math.floor(i / 9);
-            const c = i % 9;
-            const targetDigit = parseInt(val);
+                const r = Math.floor(i / 9);
+                const c = i % 9;
 
-            for (let col = 0; col < 9; col++) {
-                hideSubNum(r * 9 + col, targetDigit);
-            }
+                for (let col = 0; col < 9; col++) {
+                    hideSubNum(r * 9 + col, targetDigit);
+                }
 
-            for (let row = 0; row < 9; row++) {
-                hideSubNum(row * 9 + c, targetDigit);
-            }
+                for (let row = 0; row < 9; row++) {
+                    hideSubNum(row * 9 + c, targetDigit);
+                }
 
-            const startRow = Math.floor(r / 3) * 3;
-            const startCol = Math.floor(c / 3) * 3;
-            for (let dr = 0; dr < 3; dr++) {
-                for (let dc = 0; dc < 3; dc++) {
-                    const blockRow = startRow + dr;
-                    const blockCol = startCol + dc;
-                    hideSubNum(blockRow * 9 + blockCol, targetDigit);
+                const startRow = Math.floor(r / 3) * 3;
+                const startCol = Math.floor(c / 3) * 3;
+                for (let dr = 0; dr < 3; dr++) {
+                    for (let dc = 0; dc < 3; dc++) {
+                        const blockRow = startRow + dr;
+                        const blockCol = startCol + dc;
+                        hideSubNum(blockRow * 9 + blockCol, targetDigit);
+                    }
                 }
             }
         }

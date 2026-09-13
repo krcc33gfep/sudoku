@@ -101,13 +101,13 @@
             visibility: hidden;
         }
 
-        /* ハイライトされた小文字（太字・黄色） */
+        /* ハイライトされた小文字（トーンを落とした黄色・太字） */
         .sub-num.highlighted {
-            color: #FFFF00 !important;
+            color: #b3b300 !important;
             font-weight: bold !important;
         }
 
-        /* 確定した数字を表示する場合のオーバーレイ */
+        /* 確定した数字を表示する場合のオーバーレイ（トーンを落とした黄色 #b3b300 に変更） */
         .cell-input-overlay {
             position: absolute;
             top: 0;
@@ -120,7 +120,7 @@
             font-weight: bold;
             background: transparent;
             font-variant-numeric: tabular-nums;
-            color: #FFFF00;
+            color: #b3b300;
             caret-color: transparent;
             z-index: 2;
         }
@@ -167,7 +167,7 @@
             font-size: 15px;
         }
 
-        /* 追加したハイライト専用のボタン列用スタイル */
+        /* ハイライト専用のボタン列用スタイル */
         .highlight-pad {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
@@ -193,9 +193,9 @@
             background: #2d435b;
         }
         .hl-btn.active {
-            background: #f1c40f;
+            background: #b3b300;
             color: #000;
-            border-color: #d4ac0d;
+            border-color: #8c8c00;
         }
         .hl-label {
             grid-column: span 10;
@@ -245,7 +245,7 @@
             <button class="num-btn clear-btn" onclick="inputNumber('')">C</button>
         </div>
 
-        <!-- 追加したハイライト用のもう1列 -->
+        <!-- ハイライト用の列 -->
         <div class="highlight-pad">
             <button class="hl-btn" id="hl-1" onclick="toggleHighlight(1)">1</button>
             <button class="hl-btn" id="hl-2" onclick="toggleHighlight(2)">2</button>
@@ -258,7 +258,7 @@
             <button class="hl-btn" id="hl-9" onclick="toggleHighlight(9)">9</button>
             <button class="hl-btn" style="background:#333; color:#aaa; border-color:#444;" onclick="clearAllHighlights()">解除</button>
         </div>
-        <div class="hl-label">▼ タップした数字のメモを太字の黄色で強調表示</div>
+        <div class="hl-label">▼ タップした数字のメモをトーンを落とした黄色で強調表示</div>
 
         <div class="controls">
             <button class="reset-btn" onclick="resetGrid()">すべてリセット</button>
@@ -272,7 +272,6 @@
     let cellsData = Array(81).fill('');
     let cellElements = [];
     
-    // 現在ハイライトされている数字のセット
     let activeHighlights = new Set();
 
     function initGrid() {
@@ -323,7 +322,6 @@
             item.subNums = item.cell.querySelectorAll('.sub-num');
             item.subNums.forEach(sub => {
                 sub.classList.remove('filtered-out');
-                // ハイライト状態の復元
                 const digit = parseInt(sub.dataset.digit);
                 if (activeHighlights.has(digit)) {
                     sub.classList.add('highlighted');
@@ -374,7 +372,6 @@
         }
     }
 
-    // ハイライトの切り替え
     function toggleHighlight(num) {
         const btn = document.getElementById(`hl-${num}`);
         if (activeHighlights.has(num)) {
@@ -387,7 +384,6 @@
         updateAllCellsDisplay();
     }
 
-    // すべてのハイライトを解除
     function clearAllHighlights() {
         activeHighlights.clear();
         for (let n = 1; n <= 9; n++) {

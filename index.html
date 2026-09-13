@@ -13,7 +13,7 @@
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f0f2f5;
+            background-color: #121212; /* 全体の背景を黒に変更 */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -22,7 +22,7 @@
             height: 100dvh;
             overflow: hidden;
             padding: 10px;
-            color: #333;
+            color: #e0e0e0;
         }
         
         .container {
@@ -41,17 +41,17 @@
             display: grid;
             grid-template-columns: repeat(9, 1fr);
             grid-template-rows: repeat(9, 1fr);
-            border: 2px solid #333;
-            background: #333;
+            border: 2px solid #555;
+            background: #555; /* グリッドの格子線・ベース */
             gap: 1px;
             width: 100%;
             aspect-ratio: 1 / 1;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.5);
             border-radius: 4px;
             overflow: hidden;
         }
         .cell {
-            background: #fff;
+            background: #1e1e1e; /* マスの背景をダークトーンに */
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
@@ -59,7 +59,7 @@
             cursor: pointer;
         }
         .cell.selected {
-            background: #d0e8ff;
+            background: #263859; /* 選択中のマスは少し青みを帯びたダークカラーに */
         }
 
         /* 各セル内の9分割サブグリッド */
@@ -69,7 +69,7 @@
             justify-content: center;
             font-size: min(3.5vw, 15px);
             line-height: 1;
-            color: #ccc;
+            color: #555; /* サブ数字のデフォルトは見えにくいダークグレー */
             font-weight: bold;
             font-variant-numeric: tabular-nums;
             visibility: visible;
@@ -96,18 +96,18 @@
             font-weight: bold;
             background: transparent;
             font-variant-numeric: tabular-nums;
-            color: #0066cc;
+            color: #4da6ff; /* 入力された数字は明るいスカイブルーで見やすく */
             z-index: 2;
         }
         .cell-input-overlay:focus {
             outline: none;
-            background: rgba(208, 232, 255, 0.8);
+            background: rgba(38, 56, 89, 0.7);
         }
 
         /* 3x3ブロックの区切り線（1px） */
-        .cell:nth-child(3n):not(:nth-child(9n)) { border-right: 1px solid #333; }
+        .cell:nth-child(3n):not(:nth-child(9n)) { border-right: 1px solid #555; }
         .cell:nth-child(n+19):nth-child(-n+27),
-        .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 1px solid #333; }
+        .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 1px solid #555; }
 
         /* テンキーエリア */
         .numpad-container {
@@ -123,26 +123,27 @@
             width: 100%;
         }
         .num-btn {
-            background: #fff;
-            border: 1px solid #ccc;
+            background: #2a2a2a;
+            border: 1px solid #444;
             border-radius: 6px;
             padding: 12px 0;
             font-size: 18px;
             font-weight: bold;
+            color: #e0e0e0;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             font-variant-numeric: tabular-nums;
         }
         .num-btn:active {
-            background: #e4e6eb;
+            background: #3a3a3a;
         }
         .num-btn.clear-btn {
-            background: #fa383e;
+            background: #8b0000;
             color: white;
-            border-color: #fa383e;
+            border-color: #a00;
             font-size: 15px;
         }
 
@@ -152,14 +153,17 @@
             justify-content: flex-end;
         }
         .reset-btn {
-            background: #666;
-            color: white;
-            border: none;
+            background: #333;
+            color: #aaa;
+            border: 1px solid #444;
             border-radius: 6px;
             padding: 8px 16px;
             font-size: 12px;
             font-weight: bold;
             cursor: pointer;
+        }
+        .reset-btn:active {
+            background: #444;
         }
     </style>
 </head>

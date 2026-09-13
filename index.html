@@ -17,36 +17,39 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             height: 100vh;
+            height: 100dvh;
             overflow: hidden;
+            padding: 10px;
             color: #333;
         }
+        
+        /* 全体を収めるコンテナ */
         .container {
-            display: grid;
-            grid-template-columns: 3.5fr 1fr;
-            grid-template-rows: auto auto auto auto;
-            gap: 4px;
-            width: 96vw;
-            max-width: 420px;
-            max-height: 98vh;
-            padding: 6px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 450px;
+            height: 100%;
+            gap: 10px;
         }
-        /* メインの数独盤面 (左上) - 正方形に固定 */
+
+        /* 画面いっぱいの数独盤面 (正方形) */
         .sudoku-grid {
-            grid-column: 1;
-            grid-row: 1;
             display: grid;
             grid-template-columns: repeat(9, 1fr);
             grid-template-rows: repeat(9, 1fr);
-            border: 2px solid #333;
+            border: 3px solid #333;
             background: #333;
             gap: 1px;
-            aspect-ratio: 1 / 1;
             width: 100%;
+            aspect-ratio: 1 / 1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 4px;
+            overflow: hidden;
         }
         .cell {
             background: #fff;
@@ -63,10 +66,11 @@
             height: 100%;
             border: none;
             text-align: center;
-            font-size: 16px;
+            font-size: 24px;
             font-weight: bold;
             background: transparent;
             font-variant-numeric: tabular-nums;
+            color: #0066cc;
         }
         .cell input:focus {
             outline: none;
@@ -77,102 +81,56 @@
         .cell:nth-child(n+19):nth-child(-n+27),
         .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid #333; }
 
-        /* 右側：行（横）の未入力数字（JSで高さを完全に同期させる） */
-        .right-panel {
-            grid-column: 2;
-            grid-row: 1;
+        /* テンキーエリア */
+        .numpad-container {
+            width: 100%;
             display: flex;
             flex-direction: column;
-            padding-left: 4px;
+            gap: 6px;
         }
-        .missing-row {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-            align-items: center;
-            justify-items: center;
-        }
-        .missing-digit {
-            font-size: 9px;
-            font-weight: bold;
-            color: #0066cc;
-            font-variant-numeric: tabular-nums;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* 下側：列（縦）の未入力数字 */
-        .bottom-info-panel {
-            grid-column: 1;
-            grid-row: 2;
-            display: grid;
-            grid-template-columns: repeat(9, 1fr);
-            padding-top: 2px;
-        }
-        .col-box {
-            display: flex;
-            justify-content: center;
-        }
-        .col-nums {
-            font-size: 9px;
-            color: #e65100;
-            font-weight: bold;
-            text-align: center;
-            line-height: 1.2;
-            font-variant-numeric: tabular-nums;
-        }
-
-        /* 下部：横一列のテンキー */
-        .numpad-panel {
-            grid-column: 1 / 3;
-            grid-row: 3;
+        .numpad {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
-            gap: 3px;
-            align-items: center;
-            margin-top: 4px;
+            gap: 4px;
+            width: 100%;
         }
         .num-btn {
-            background: #e4e6eb;
-            border: none;
-            border-radius: 4px;
-            padding: 8px 0;
-            font-size: 14px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 12px 0;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             font-variant-numeric: tabular-nums;
         }
         .num-btn:active {
-            background: #d8dadf;
+            background: #e4e6eb;
         }
         .num-btn.clear-btn {
             background: #fa383e;
             color: white;
-            font-size: 12px;
+            border-color: #fa383e;
+            font-size: 15px;
         }
 
-        /* 最下段：リセットボタンなど */
-        .extra-panel {
-            grid-column: 1 / 3;
-            grid-row: 4;
+        /* コントロールエリア（リセットなど） */
+        .controls {
+            width: 100%;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 4px;
+            justify-content: flex-end;
         }
         .reset-btn {
-            background: #fa383e;
+            background: #666;
             color: white;
             border: none;
-            border-radius: 4px;
-            padding: 6px 16px;
-            font-size: 11px;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 12px;
             font-weight: bold;
             cursor: pointer;
         }
@@ -181,40 +139,32 @@
 <body>
 
 <div class="container">
-    <!-- 数独盤面 -->
+    <!-- 数独盤面（画面いっぱい＆正方形） -->
     <div class="sudoku-grid" id="grid"></div>
 
-    <!-- 右側：行（横）の未入力数字 -->
-    <div class="right-panel" id="rightPanel"></div>
-
-    <!-- 下側：列（縦）の未入力数字 -->
-    <div class="bottom-info-panel" id="colPanel"></div>
-
-    <!-- 下部：横一列のテンキー（1〜9 ＋ C） -->
-    <div class="numpad-panel">
-        <button class="num-btn" onclick="inputNumber(1)">1</button>
-        <button class="num-btn" onclick="inputNumber(2)">2</button>
-        <button class="num-btn" onclick="inputNumber(3)">3</button>
-        <button class="num-btn" onclick="inputNumber(4)">4</button>
-        <button class="num-btn" onclick="inputNumber(5)">5</button>
-        <button class="num-btn" onclick="inputNumber(6)">6</button>
-        <button class="num-btn" onclick="inputNumber(7)">7</button>
-        <button class="num-btn" onclick="inputNumber(8)">8</button>
-        <button class="num-btn" onclick="inputNumber(9)">9</button>
-        <button class="num-btn clear-btn" onclick="inputNumber('')">C</button>
-    </div>
-
-    <!-- 最下段：リセットボタン -->
-    <div class="extra-panel">
-        <button class="reset-btn" onclick="resetGrid()">すべてリセット</button>
+    <!-- テンキー (1〜9 ＋ C) -->
+    <div class="numpad-container">
+        <div class="numpad">
+            <button class="num-btn" onclick="inputNumber(1)">1</button>
+            <button class="num-btn" onclick="inputNumber(2)">2</button>
+            <button class="num-btn" onclick="inputNumber(3)">3</button>
+            <button class="num-btn" onclick="inputNumber(4)">4</button>
+            <button class="num-btn" onclick="inputNumber(5)">5</button>
+            <button class="num-btn" onclick="inputNumber(6)">6</button>
+            <button class="num-btn" onclick="inputNumber(7)">7</button>
+            <button class="num-btn" onclick="inputNumber(8)">8</button>
+            <button class="num-btn" onclick="inputNumber(9)">9</button>
+            <button class="num-btn clear-btn" onclick="inputNumber('')">C</button>
+        </div>
+        <div class="controls">
+            <button class="reset-btn" onclick="resetGrid()">すべてリセット</button>
+        </div>
     </div>
 </div>
 
 <script>
     let selectedCell = null;
     const gridEl = document.getElementById('grid');
-    const rightPanelEl = document.getElementById('rightPanel');
-    const colPanelEl = document.getElementById('colPanel');
     let cells = [];
 
     function initGrid() {
@@ -237,22 +187,18 @@
             input.addEventListener('input', () => {
                 const val = input.value.replace(/[^1-9]/g, '');
                 input.value = val ? val[0] : '';
-                updatePanels();
             });
 
             cell.appendChild(input);
             gridEl.appendChild(cell);
             cells.push(input);
         }
-        updatePanels();
-        window.addEventListener('resize', updatePanels);
     }
 
     function inputNumber(num) {
         if (!selectedCell) return;
         const input = selectedCell.querySelector('input');
         input.value = num;
-        updatePanels();
         
         let currentIndex = parseInt(input.dataset.index);
         if (currentIndex < 80 && num !== '') {
@@ -260,73 +206,9 @@
         }
     }
 
-    function updatePanels() {
-        // 盤面の1マスの実際の高さを計算し、右側の各行の高さを完全に同期させる
-        const firstCell = gridEl.querySelector('.cell');
-        const cellHeight = firstCell ? firstCell.offsetHeight : 0;
-
-        rightPanelEl.innerHTML = '';
-        for (let r = 0; r < 9; r++) {
-            const rowNums = new Set();
-            for (let c = 0; c < 9; c++) {
-                const val = parseInt(cells[r * 9 + c].value);
-                if (val >= 1 && val <= 9) rowNums.add(val);
-            }
-            const missing = [];
-            for (let n = 1; n <= 9; n++) {
-                if (!rowNums.has(n)) missing.push(n);
-            }
-
-            const rowDiv = document.createElement('div');
-            rowDiv.classList.add('missing-row');
-            if (cellHeight > 0) {
-                rowDiv.style.height = `${cellHeight}px`;
-            }
-
-            const mid = Math.ceil(missing.length / 2);
-            const part1 = missing.slice(0, mid);
-            const part2 = missing.slice(mid);
-
-            for (let i = 0; i < 5; i++) {
-                const span = document.createElement('span');
-                span.classList.add('missing-digit');
-                if (i < part1.length) span.textContent = part1[i];
-                rowDiv.appendChild(span);
-            }
-            for (let i = 0; i < 5; i++) {
-                const span = document.createElement('span');
-                span.classList.add('missing-digit');
-                if (i < part2.length) span.textContent = part2[i];
-                rowDiv.appendChild(span);
-            }
-
-            rightPanelEl.appendChild(rowDiv);
-        }
-
-        // 列（縦）の計算
-        colPanelEl.innerHTML = '';
-        for (let c = 0; c < 9; c++) {
-            const colNums = new Set();
-            for (let r = 0; r < 9; r++) {
-                const val = parseInt(cells[r * 9 + c].value);
-                if (val >= 1 && val <= 9) colNums.add(val);
-            }
-            const missing = [];
-            for (let n = 1; n <= 9; n++) {
-                if (!colNums.has(n)) missing.push(n);
-            }
-
-            const colBox = document.createElement('div');
-            colBox.classList.add('col-box');
-            colBox.innerHTML = `<span class="col-nums">${missing.join('<br>')}</span>`;
-            colPanelEl.appendChild(colBox);
-        }
-    }
-
     function resetGrid() {
         if (confirm("盤面をすべてリセットしますか？")) {
             cells.forEach(input => input.value = '');
-            updatePanels();
         }
     }
 

@@ -13,7 +13,7 @@
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #121212; /* 全体の背景を黒に変更 */
+            background-color: #121212;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -41,9 +41,9 @@
             display: grid;
             grid-template-columns: repeat(9, 1fr);
             grid-template-rows: repeat(9, 1fr);
-            border: 2px solid #fff; /* ←外枠だけ白にする */
-            background: #555; /* ←中の格子線は元の見やすいグレーに戻す */
-            gap: 1px;
+            border: 2px solid #fff;
+            background: #1e1e1e;
+            gap: 0; /* gapをなくしてセル同士のボーダーで線を表現する */
             width: 100%;
             aspect-ratio: 1 / 1;
             box-shadow: 0 4px 16px rgba(0,0,0,0.5);
@@ -51,15 +51,28 @@
             overflow: hidden;
         }
         .cell {
-            background: #1e1e1e; /* マスの背景をダークトーンに */
+            background: #1e1e1e;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
             position: relative;
             cursor: pointer;
+            /* 全セルに基本の白い細い境界線を設定 */
+            border-right: 1px solid #fff;
+            border-bottom: 1px solid #fff;
         }
+        /* 9列目の右ボーダーは不要なので消す */
+        .cell:nth-child(9n) {
+            border-right: none;
+        }
+        /* 9行目の下ボーダーは不要なので消す */
+        .cell:nth-child(n+73):nth-child(-n+81) {
+            border-bottom: none;
+        }
+        /* 3x3ブロックの区切りを少し太くしたい場合はここで調整可能だが、今回はすべて白線で統一 */
+
         .cell.selected {
-            background: #263859; /* 選択中のマスは少し青みを帯びたダークカラーに */
+            background: #263859;
         }
 
         /* 各セル内の9分割サブグリッド */
@@ -69,7 +82,7 @@
             justify-content: center;
             font-size: min(3.5vw, 15px);
             line-height: 1;
-            color: #555; /* サブ数字のデフォルトは見えにくいダークグレー */
+            color: #666;
             font-weight: bold;
             font-variant-numeric: tabular-nums;
             visibility: visible;
@@ -96,18 +109,13 @@
             font-weight: bold;
             background: transparent;
             font-variant-numeric: tabular-nums;
-            color: #4da6ff; /* 入力された数字は明るいスカイブルーで見やすく */
+            color: #4da6ff;
             z-index: 2;
         }
         .cell-input-overlay:focus {
             outline: none;
             background: rgba(38, 56, 89, 0.7);
         }
-
-        /* 3x3ブロックの区切り線（1px） */
-        .cell:nth-child(3n):not(:nth-child(9n)) { border-right: 1px solid #555; }
-        .cell:nth-child(n+19):nth-child(-n+27),
-        .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 1px solid #555; }
 
         /* テンキーエリア */
         .numpad-container {
@@ -239,16 +247,13 @@
         }
     }
 
-    // 盤面全体を走査し、確定した数字に基づき各セルのサブ数字の表示・非表示を判定する
     function updateAllCellsDisplay() {
-        // まず全マスの状態をリセット
         cellElements.forEach(item => {
             item.cell.classList.remove('has-value');
             item.subNums = item.cell.querySelectorAll('.sub-num');
             item.subNums.forEach(sub => sub.classList.remove('filtered-out'));
         });
 
-        // 入力されている全てのセルについて、行・列・3x3ブロックの同数字を非表示にする
         for (let i = 0; i < 81; i++) {
             const val = cellsData[i];
             if (!val) continue;
@@ -260,17 +265,14 @@
             const c = i % 9;
             const targetDigit = parseInt(val);
 
-            // 1. 同じ行（横）
             for (let col = 0; col < 9; col++) {
                 hideSubNum(r * 9 + col, targetDigit);
             }
 
-            // 2. 同じ列（縦）
             for (let row = 0; row < 9; row++) {
                 hideSubNum(row * 9 + c, targetDigit);
             }
 
-            // 3. 同じ3×3ブロック（太枠内）
             const startRow = Math.floor(r / 3) * 3;
             const startCol = Math.floor(c / 3) * 3;
             for (let dr = 0; dr < 3; dr++) {
@@ -285,7 +287,7 @@
 
     function hideSubNum(cellIndex, digit) {
         const cellEl = cellElements[cellIndex].cell;
-        if (cellsData[cellIndex]) return; // すでに数字が入っているセルはスキップ
+        if (cellsData[cellIndex]) return;
 
         const subNumEl = cellEl.querySelector(`.sub-num[data-digit="${digit}"]`);
         if (subNumEl) {

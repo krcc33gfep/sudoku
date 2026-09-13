@@ -82,7 +82,7 @@
             background: #263859;
         }
 
-        /* 各セル内の9分割サブグリッド（白のトーンを約20%落とした #cccccc に変更） */
+        /* 各セル内の9分割サブグリッド */
         .sub-num {
             display: flex;
             align-items: center;
@@ -101,13 +101,13 @@
             visibility: hidden;
         }
 
-        /* ハイライトされた小文字（トーンを落とした黄色・太字） */
+        /* ハイライトされた小文字（青系・太字） */
         .sub-num.highlighted {
-            color: #b3b300 !important;
+            color: #4da6ff !important;
             font-weight: bold !important;
         }
 
-        /* 確定した数字を表示する場合のオーバーレイ */
+        /* 確定した数字を表示する場合のオーバーレイ（必要であればここも青系に合わせる場合は変更可能ですが、今回はそのまま） */
         .cell-input-overlay {
             position: absolute;
             top: 0;
@@ -120,7 +120,7 @@
             font-weight: bold;
             background: transparent;
             font-variant-numeric: tabular-nums;
-            color: #b3b300;
+            color: #4da6ff;
             caret-color: transparent;
             z-index: 2;
         }
@@ -193,9 +193,9 @@
             background: #2d435b;
         }
         .hl-btn.active {
-            background: #b3b300;
+            background: #4da6ff;
             color: #000;
-            border-color: #8c8c00;
+            border-color: #2680d9;
         }
 
         .controls {

@@ -197,31 +197,30 @@
             color: #000;
             border-color: #8c8c00;
         }
-        .hl-label {
-            grid-column: span 10;
-            font-size: 11px;
-            color: #888;
-            text-align: center;
-            margin-top: -2px;
-        }
 
         .controls {
             width: 100%;
             display: flex;
             justify-content: flex-end;
+            gap: 6px;
         }
-        .reset-btn {
+        .control-btn {
             background: #333;
             color: #aaa;
             border: 1px solid #444;
             border-radius: 6px;
-            padding: 8px 16px;
+            padding: 8px 12px;
             font-size: 12px;
             font-weight: bold;
             cursor: pointer;
         }
-        .reset-btn:active {
+        .control-btn:active {
             background: #444;
+        }
+        .control-btn.lock-active {
+            background: #1a4d2e;
+            color: #7ef8a8;
+            border-color: #277747;
         }
     </style>
 </head>
@@ -258,10 +257,12 @@
             <button class="hl-btn" id="hl-9" onclick="toggleHighlight(9)">9</button>
             <button class="hl-btn" style="background:#333; color:#aaa; border-color:#444;" onclick="clearAllHighlights()">解除</button>
         </div>
-        <div class="hl-label">▼ タップした数字のメモをトーンを落とした黄色で強調表示</div>
 
+        <!-- コントロールボタン群（ロック・戻す・すべてリセット） -->
         <div class="controls">
-            <button class="reset-btn" onclick="resetGrid()">すべてリセット</button>
+            <button class="control-btn" id="lock-btn" onclick="toggleLock()">状態ロック</button>
+            <button class="control-btn" id="revert-btn" onclick="revertToLock()" style="display:none;">やり直す</button>
+            <button class="control-btn" onclick="resetGrid()">すべてリセット</button>
         </div>
     </div>
 </div>
@@ -273,8 +274,11 @@
     let cellElements = [];
     
     let activeHighlights = new Set();
+    
+    // ロック機能用変数
+    let isLocked = false;
+    let lockedData = null;
 
-    // ローカルストレージからデータを読み込む
     function loadFromStorage() {
         const savedData = localStorage.getItem('sudoku_cells_data');
         if (savedData) {
@@ -294,12 +298,28 @@
                 activeHighlights = new Set();
             }
         }
+
+        // ロックデータの読み込み
+        const savedLock = localStorage.getItem('sudoku_locked_data');
+        if (savedLock) {
+            try {
+                lockedData = JSON.parse(savedLock);
+                isLocked = true;
+            } catch (e) {
+                lockedData = null;
+                isLocked = false;
+            }
+        }
     }
 
-    // ローカルストレージにデータを保存する
     function saveToStorage() {
         localStorage.setItem('sudoku_cells_data', JSON.stringify(cellsData));
         localStorage.setItem('sudoku_highlights', JSON.stringify(Array.from(activeHighlights)));
+        if (isLocked && lockedData) {
+            localStorage.setItem('sudoku_locked_data', JSON.stringify(lockedData));
+        } else {
+            localStorage.removeItem('sudoku_locked_data');
+        }
     }
 
     function initGrid() {
@@ -346,12 +366,12 @@
             cellElements.push({ cell, input });
         }
 
-        // 保存されていたハイライトボタンの状態をUIに反映
         activeHighlights.forEach(num => {
             const btn = document.getElementById(`hl-${num}`);
             if (btn) btn.classList.add('active');
         });
 
+        updateLockButtonUI();
         updateAllCellsDisplay();
     }
 
@@ -448,13 +468,68 @@
         }
     }
 
+    // ロック機能の切り替え（ON/OFF）
+    function toggleLock() {
+        const lockBtn = document.getElementById('lock-btn');
+        if (!isLocked) {
+            // ロック実行
+            lockedData = [...cellsData];
+            isLocked = true;
+            lockBtn.textContent = "ロック解除";
+            lockBtn.classList.add('lock-active');
+        } else {
+            // ロック解除
+            if (confirm("ロックを解除して現在の状態を新しい基準にしますか？")) {
+                lockedData = null;
+                isLocked = false;
+                lockBtn.textContent = "状態ロック";
+                lockBtn.classList.remove('lock-active');
+            }
+        }
+        saveToStorage();
+        updateLockButtonUI();
+    }
+
+    // ロック時点の盤面に戻す
+    function revertToLock() {
+        if (!isLocked || !lockedData) return;
+        if (confirm("ロック直後の状態に戻しますか？（その後の入力は破棄されます）")) {
+            cellsData = [...lockedData];
+            cellElements.forEach((item, idx) => {
+                item.input.value = cellsData[idx];
+            });
+            saveToStorage();
+            updateAllCellsDisplay();
+        }
+    }
+
+    // ロックボタンと「やり直す」ボタンの表示状態を更新
+    function updateLockButtonUI() {
+        const lockBtn = document.getElementById('lock-btn');
+        const revertBtn = document.getElementById('revert-btn');
+        
+        if (isLocked) {
+            lockBtn.textContent = "ロック解除";
+            lockBtn.classList.add('lock-active');
+            revertBtn.style.display = "inline-block";
+        } else {
+            lockBtn.textContent = "状態ロック";
+            lockBtn.classList.remove('lock-active');
+            revertBtn.style.display = "none";
+        }
+    }
+
     function resetGrid() {
         if (confirm("盤面をすべてリセットしますか？")) {
             cellsData.fill('');
             cellElements.forEach(item => item.input.value = '');
             clearAllHighlights();
+            isLocked = false;
+            lockedData = null;
             localStorage.removeItem('sudoku_cells_data');
             localStorage.removeItem('sudoku_highlights');
+            localStorage.removeItem('sudoku_locked_data');
+            updateLockButtonUI();
             updateAllCellsDisplay();
         }
     }

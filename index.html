@@ -72,13 +72,13 @@
             color: #ccc;
             font-weight: bold;
             font-variant-numeric: tabular-nums;
-            visibility: visible; /* デフォルトは表示 */
+            visibility: visible;
         }
-        /* 自セルに数字が入力されたら、そのセルのサブ数字はすべて非表示（位置は保持） */
+        /* 自セルに数字が入力されたらサブ数字はすべて非表示 */
         .cell.has-value .sub-num {
             visibility: hidden;
         }
-        /* 縦横の連動で非表示にする場合 */
+        /* 連動で非表示にする場合 */
         .sub-num.filtered-out {
             visibility: hidden;
         }
@@ -237,14 +237,14 @@
 
     // 盤面全体を走査し、確定した数字に基づき各セルのサブ数字の表示・非表示を判定する
     function updateAllCellsDisplay() {
-        // まず全マスの「has-value」と「filtered-out」をリセット
+        // まず全マスの状態をリセット
         cellElements.forEach(item => {
             item.cell.classList.remove('has-value');
             item.subNums = item.cell.querySelectorAll('.sub-num');
             item.subNums.forEach(sub => sub.classList.remove('filtered-out'));
         });
 
-        // 入力されている全てのセルについて、縦横の同数字を非表示にするルールを適用
+        // 入力されている全てのセルについて、行・列・3x3ブロックの同数字を非表示にする
         for (let i = 0; i < 81; i++) {
             const val = cellsData[i];
             if (!val) continue;
@@ -256,25 +256,32 @@
             const c = i % 9;
             const targetDigit = parseInt(val);
 
-            // 同じ行（横）のセルを走査
+            // 1. 同じ行（横）
             for (let col = 0; col < 9; col++) {
-                const idx = r * 9 + col;
-                hideSubNum(idx, targetDigit);
+                hideSubNum(r * 9 + col, targetDigit);
             }
 
-            // 同じ列（縦）のセルを走査
+            // 2. 同じ列（縦）
             for (let row = 0; row < 9; row++) {
-                const idx = row * 9 + c;
-                hideSubNum(idx, targetDigit);
+                hideSubNum(row * 9 + c, targetDigit);
+            }
+
+            // 3. 同じ3×3ブロック（太枠内）
+            const startRow = Math.floor(r / 3) * 3;
+            const startCol = Math.floor(c / 3) * 3;
+            for (let dr = 0; dr < 3; dr++) {
+                for (let dc = 0; dc < 3; dc++) {
+                    const blockRow = startRow + dr;
+                    const blockCol = startCol + dc;
+                    hideSubNum(blockRow * 9 + blockCol, targetDigit);
+                }
             }
         }
     }
 
-    // 指定したセルの特定のサブ数字（digit）を非表示にする補助関数
     function hideSubNum(cellIndex, digit) {
         const cellEl = cellElements[cellIndex].cell;
-        // すでに自セルに数字が入っている場合はクラス制御に任せる
-        if (cellsData[cellIndex]) return;
+        if (cellsData[cellIndex]) return; // すでに数字が入っているセルはスキップ
 
         const subNumEl = cellEl.querySelector(`.sub-num[data-digit="${digit}"]`);
         if (subNumEl) {

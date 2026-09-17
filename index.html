@@ -57,8 +57,9 @@
             grid-template-rows: repeat(3, 1fr);
             position: relative;
             cursor: pointer;
-            border-right: 1px solid #ffffff;
-            border-bottom: 1px solid #ffffff;
+            /* 1. 細い線をさらに細く (0.5px) */
+            border-right: 0.5px solid #ffffff;
+            border-bottom: 0.5px solid #ffffff;
         }
 
         /* 3x3ブロックの右側の境界線を太くする (3列目、6列目) */
@@ -94,7 +95,8 @@
             justify-content: center;
             font-size: min(3.5vw, 15px);
             line-height: 1;
-            color: #b0b0b0;
+            /* 2. 小さい文字をもっとグレーに */
+            color: #777777;
             font-weight: normal;
             font-variant-numeric: tabular-nums;
             visibility: visible;

@@ -14,7 +14,6 @@
             -webkit-text-size-adjust: 100%;
         }
         body {
-            /* M PLUS Rounded 1c を適用（サンセリフ体をフォールバックに指定） */
             font-family: 'M PLUS Rounded 1c', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: #141414;
             display: flex;
@@ -39,13 +38,13 @@
             gap: 10px;
         }
 
-        /* 画面いっぱいの数独盤面 (正方形) */
+        /* 画面いっぱいの数独盤面 (正方形) - 背景を#141414に統一 */
         .sudoku-grid {
             display: grid;
             grid-template-columns: repeat(9, 1fr);
             grid-template-rows: repeat(9, 1fr);
             border: 2px solid #ffffff;
-            background: #1c1c1c;
+            background: #141414;
             gap: 0;
             width: 100%;
             aspect-ratio: 1 / 1;
@@ -54,7 +53,7 @@
             overflow: hidden;
         }
         .cell {
-            background: #1c1c1c;
+            background: #141414;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
@@ -131,7 +130,7 @@
             color: #ffd700;
             caret-color: transparent;
             z-index: 2;
-            font-family: inherit; /* フォントを継承 */
+            font-family: inherit;
         }
         .cell-input-overlay:focus {
             outline: none;
@@ -177,7 +176,7 @@
             font-size: 15px;
         }
 
-        /* ハイライト専用のボタン列用スタイル（正方形にそろえる） */
+        /* ハイライト用の列（すべて正方形） */
         .highlight-pad {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
@@ -505,7 +504,7 @@
 
     function revertToLock() {
         if (!isLocked || !lockedData) return;
-        if (confirm("ロック直後の状態に戻しますか？（その後の入力は破棄されます）")) {
+        if (confirm("ロック直后的状態に戻しますか？（その後の入力は破棄されます）")) {
             cellsData = [...lockedData];
             cellElements.forEach((item, idx) => {
                 item.input.value = cellsData[idx];

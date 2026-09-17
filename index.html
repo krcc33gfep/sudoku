@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>数独サポート</title>
+    <!-- M PLUS Rounded 1c フォントの読み込み -->
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -12,7 +14,8 @@
             -webkit-text-size-adjust: 100%;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            /* M PLUS Rounded 1c を適用（サンセリフ体をフォールバックに指定） */
+            font-family: 'M PLUS Rounded 1c', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: #141414;
             display: flex;
             flex-direction: column;
@@ -42,7 +45,7 @@
             grid-template-columns: repeat(9, 1fr);
             grid-template-rows: repeat(9, 1fr);
             border: 2px solid #ffffff;
-            background: #141414;
+            background: #1c1c1c;
             gap: 0;
             width: 100%;
             aspect-ratio: 1 / 1;
@@ -51,13 +54,12 @@
             overflow: hidden;
         }
         .cell {
-            background: #141414;
+            background: #1c1c1c;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
             position: relative;
             cursor: pointer;
-            /* 1. 細い線をさらに細く (0.5px) */
             border-right: 0.5px solid #ffffff;
             border-bottom: 0.5px solid #ffffff;
         }
@@ -95,7 +97,6 @@
             justify-content: center;
             font-size: min(3.5vw, 15px);
             line-height: 1;
-            /* 2. 小さい文字をもっとグレーに */
             color: #777777;
             font-weight: normal;
             font-variant-numeric: tabular-nums;
@@ -130,6 +131,7 @@
             color: #ffd700;
             caret-color: transparent;
             z-index: 2;
+            font-family: inherit; /* フォントを継承 */
         }
         .cell-input-overlay:focus {
             outline: none;
@@ -163,6 +165,7 @@
             justify-content: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             font-variant-numeric: tabular-nums;
+            font-family: inherit;
         }
         .num-btn:active {
             background: #363636;
@@ -195,6 +198,7 @@
             justify-content: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             font-variant-numeric: tabular-nums;
+            font-family: inherit;
         }
         .hl-btn:active {
             background: #263c54;
@@ -220,6 +224,7 @@
             font-size: 12px;
             font-weight: bold;
             cursor: pointer;
+            font-family: inherit;
         }
         .control-btn:active {
             background: #383838;

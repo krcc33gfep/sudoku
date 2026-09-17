@@ -57,6 +57,7 @@
             grid-template-rows: repeat(3, 1fr);
             position: relative;
             cursor: pointer;
+            /* 1. 細い線をさらに細く (0.5px) */
             border-right: 0.5px solid #ffffff;
             border-bottom: 0.5px solid #ffffff;
         }
@@ -94,6 +95,7 @@
             justify-content: center;
             font-size: min(3.5vw, 15px);
             line-height: 1;
+            /* 2. 小さい文字をもっとグレーに */
             color: #777777;
             font-weight: normal;
             font-variant-numeric: tabular-nums;
@@ -106,13 +108,13 @@
             visibility: hidden;
         }
 
-        /* ハイライトされた小さな数字（ゴールド系・太字） */
+        /* ハイライトされた小さな数字（見やすい青系・太字） */
         .sub-num.highlighted {
-            color: #ffd700 !important;
+            color: #58b2ff !important;
             font-weight: bold !important;
         }
 
-        /* 確定した数字を表示する場合のオーバーレイ（見やすい青系・細字） */
+        /* 確定した数字を表示する場合のオーバーレイ（ゴールド系・細字） */
         .cell-input-overlay {
             position: absolute;
             top: 0;
@@ -125,7 +127,7 @@
             font-weight: normal;
             background: transparent;
             font-variant-numeric: tabular-nums;
-            color: #58b2ff;
+            color: #ffd700;
             caret-color: transparent;
             z-index: 2;
         }
